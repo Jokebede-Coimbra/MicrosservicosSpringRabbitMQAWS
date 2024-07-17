@@ -7,8 +7,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
+import java.text.NumberFormat;
 import java.util.List;
-
 
 @Mapper
 public interface PropostaMapper {
@@ -20,6 +20,10 @@ public interface PropostaMapper {
     @Mapping(target = "usuario.cpf", source = "cpf")
     @Mapping(target = "usuario.telefone", source = "telefone")
     @Mapping(target = "usuario.renda", source = "renda")
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "aprovado", ignore = true)
+    @Mapping(target = "integrada", constant = "true")
+    @Mapping(target = "observacao", ignore = true)
     Proposta convertDtoProposta(PropostaRequestDto propostaRequestDto);
 
     @Mapping(target = "nome", source = "usuario.nome")
@@ -27,7 +31,20 @@ public interface PropostaMapper {
     @Mapping(target = "telefone", source = "usuario.telefone")
     @Mapping(target = "cpf", source = "usuario.cpf")
     @Mapping(target = "renda", source = "usuario.renda")
+    @Mapping(target = "valorSolicitadoFmt", expression = "java(setValorSolicitadoFmt(proposta))")
     PropostaResponseDto convertEntityToDto(Proposta proposta);
 
     List<PropostaResponseDto> convertListEntityToListDto(Iterable<Proposta> proposta);
+
+    //    default String setValorSolicitadoFmt(Proposta proprosta) {
+//        return NumberFormat.getCurrencyInstance().format(proprosta.getValorSolicitado());
+//    }
+    default String setValorSolicitadoFmt(Proposta proposta) {
+        Double valor = proposta.getValorSolicitado();
+        if (valor == null) {
+            return "";
+        }
+        return NumberFormat.getCurrencyInstance().format(valor);
+    }
 }
+
